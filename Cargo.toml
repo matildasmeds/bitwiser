@@ -1,0 +1,8 @@
+[package]
+name = "bitwiser"
+version = "0.1.0"
+authors = ["Matilda Smeds"]
+
+[dependencies]
+rand = "0.4"
+rand_derive = "0.3"
