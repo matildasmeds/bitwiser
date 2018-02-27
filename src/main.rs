@@ -9,40 +9,66 @@ extern crate rand;
 #[macro_use]
 extern crate rand_derive;
 use rand::Rng;
+use rand::distributions::{Range, Sample};
 
-#[derive(Debug, Rand)]
+#[derive(Debug, Rand, PartialEq)]
 enum Operator {
     And,
     Or,
     XOr,
-    // LShift,
-    // RShift,
+    LShift,
+    RShift,
 }
 
-fn execute(values: (u8, u8), operator: Operator) -> u16 {
+fn execute(values: (u32, u32), operator: Operator) -> u32 {
     match operator {
-        Operator::And    => ( values.0 & values.1 ) as u16,
-        Operator::Or     => ( values.0 | values.1 ) as u16,
-        Operator::XOr    => ( values.0 ^ values.1 ) as u16,
-        // Must limit operand size before attempting to use these
-        // Operator::LShift => ( values.0 << values.1 ) as u16,
-        // Operator::RShift => ( values.0 >> values.1 ) as u16,
+        Operator::And    => ( values.0 & values.1 ),
+        Operator::Or     => ( values.0 | values.1 ),
+        Operator::XOr    => ( values.0 ^ values.1 ),
+        Operator::LShift => ( values.0 << values.1 ),
+        Operator::RShift => ( values.0 >> values.1 ),
     }
 }
 
 fn random_operator() -> Operator {
+    // Could maybe be static variable used throughout the code
     let mut rng = rand::thread_rng();
     let operator: Operator = rng.gen();
     operator
 }
 
+// To implement default parameter values in Rust, use Option
+fn random_operands(ranges: Option<(Range<u32>, Range<u32>)>) -> (u32, u32) {
+    match ranges {
+        None => {
+            (rand::random::<u8>() as u32, rand::random::<u8>() as u32)
+        },
+        Some(ranges) => {
+            // ranges must be mutable to be sampled
+            // cloning is simpler than revising whole mutability chain
+            let mut _ranges = ranges.clone();
+            let mut rng = rand::thread_rng();
+            let a = _ranges.0.sample(&mut rng);
+            let b = _ranges.1.sample(&mut rng);
+            (a, b)
+        },
+    }
+}
+
 fn main() {
-    let a = rand::random::<u8>();
-    println!("{:b}", a);
     let operator = random_operator();
+    let ranges = match operator {
+        // Operand values are capped to 1) stay within variable size limits
+        // and 2) to produce small but varied enough combinations, for manual
+        // calculation
+        Operator::LShift => Some((Range::new(1, 127), Range::new(1, 7))),
+        Operator::RShift => Some((Range::new(127, 255), Range::new(1,7))),
+        _ => None
+    };
+    let values = random_operands(ranges);
+    let result = execute(values, operator);
+    println!("{:b}", values.0);
     println!("{:?}", operator);
-    let b = rand::random::<u8>();
-    println!("{:b}", b);
-    let c = execute((a, b), operator);
-    println!("{:b}", c);
-  }
+    println!("{:b}", values.1);
+    println!("{:b}", result);
+}
