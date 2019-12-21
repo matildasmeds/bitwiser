@@ -59,7 +59,7 @@ fn random_operands(ranges: Option<(Range<u32>, Range<u32>)>) -> (u32, u32) {
 
 fn main() {
     let operator = random_operator();
-    
+
     let ranges = match operator {
         // Operand values are capped to 1) stay within variable size limits
         // and 2) to produce small but varied enough combinations, for manual
@@ -68,7 +68,7 @@ fn main() {
         Operator::RShift => Some((Range::new(127, 255), Range::new(1,7))),
         _ => None
     };
-    
+
     let values = random_operands(ranges);
     println!("What is the result of the following operation?");
     print!("  {:b}", values.0);
