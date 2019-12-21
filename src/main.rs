@@ -2,8 +2,10 @@
 // and operands, and calculates result.
 // Things I'd like to do:
 //   * Improve formatting, so that printed values are leftpadded
-//   * Wait for user input, and check correctness of answer
+//   * Check correctness of answer
 //   * Come up with suitable limit for Shift operands
+
+use std::io;
 
 extern crate rand;
 #[macro_use]
@@ -57,6 +59,7 @@ fn random_operands(ranges: Option<(Range<u32>, Range<u32>)>) -> (u32, u32) {
 
 fn main() {
     let operator = random_operator();
+    
     let ranges = match operator {
         // Operand values are capped to 1) stay within variable size limits
         // and 2) to produce small but varied enough combinations, for manual
@@ -65,10 +68,19 @@ fn main() {
         Operator::RShift => Some((Range::new(127, 255), Range::new(1,7))),
         _ => None
     };
+    
     let values = random_operands(ranges);
-    let result = execute(values, operator);
-    println!("{:b}", values.0);
-    println!("{:?}", operator);
+    println!("What is the result of the following operation?");
+    print!("  {:b}", values.0);
+    print!(" {:?} ", operator);
     println!("{:b}", values.1);
-    println!("{:b}", result);
+
+    let mut answer = String::new();
+
+    io::stdin().read_line(&mut answer)
+        .expect("Failed to read line");
+
+    let correct_answer = execute(values, operator);
+    println!("Your answer: {:?}", answer.trim());
+    println!("Correct answer: {:b}", correct_answer);
 }
