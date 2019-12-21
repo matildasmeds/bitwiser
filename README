@@ -1,3 +1,7 @@
-Run the program like so
+Bitwiser is a simple command line tool for practicing bitwise operations.
+
+Source code: github.com/matildasmeds/bitwiser
+
+Run the program:
 
 % docker run -it matildasmeds/bitwiser
