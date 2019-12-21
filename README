@@ -1,0 +1,3 @@
+Run the program like so
+
+% docker run -it matildasmeds/bitwiser
